@@ -5,7 +5,7 @@ const tsProj = ts.createProject("tsconfig.json");
 
 const outDir = "dist";
 
-gulp.task("build", () => {
+const build = () => {
   return tsProj
     .src()
     .pipe(tsProj())
@@ -13,14 +13,19 @@ gulp.task("build", () => {
       .pipe(
         gulp.dest(outDir)
       );
+}
+
+gulp.task("build", () => {
+  return build();
 });
 
-gulp.task("watch", () => {
-  gulp.series([ "build" ]);
-
-  gulp.watch([ "src/**/*.ts" ], (cb) => {
-    console.log("starting build...");
-    gulp.series([ "build" ]);
-    cb();
-  });
+gulp.task("doWatch", () => {
+  gulp.watch([ "src/**/*.ts" ], gulp.series("build"));
 });
+
+gulp.task("watch", 
+  gulp.series(
+    "build", 
+    "doWatch"
+  )
+);
