@@ -3,31 +3,52 @@ import { graphqlHTTP } from "express-graphql";
 import { buildSchema } from "graphql";
 import dotenv from "dotenv";
 
-import { graph as helloGraph } from "./graph/hello";
-import { graph as goodbyeGraph } from "./graph/goodbye";
+import { helloGraph } from "./graph/hello";
+import { goodbyeGraph } from "./graph/goodbye";
+import { itemGraph } from "./graph/item";
+import { Db } from "./data/db";
 
 dotenv.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 7000;
 
 const constructGraph = () => {
-  const subGraphs = [ helloGraph, goodbyeGraph ];
+  const db = new Db();
+  const subGraphs = [ helloGraph(db), goodbyeGraph(db), itemGraph(db) ];
 
+  let types = "";
   let queries = "";
+  let mutations = "";
+
   subGraphs.forEach(sg => {
-    queries += `${sg.schema.query}\n\n`;
+    if (sg.schema.types !== "") {
+      types += `${sg.schema.types}\n\n`;
+    }
+    if (sg.schema.query !== "") {
+      queries += `${sg.schema.query}\n\n`;
+    }
+    if (sg.schema.mutation !== "") {
+      mutations += `${sg.schema.mutation}\n\n`;
+    }
   });
 
-  const schema = buildSchema(`
+  const rawSchema = `
+    ${types}
+
     type Query {
       ${queries}
     }
-  `);
+
+    type Mutation {
+      ${mutations}
+    }
+  `;
+  const schema = buildSchema(rawSchema);
 
   const root: any = {};
   subGraphs.forEach(sg => {
-    for (const resolver in sg.resolvers) {
-      root[resolver] = sg.resolvers[resolver];
+    for (const item in sg.root) {
+      root[item] = sg.root[item];
     }
   });
 
