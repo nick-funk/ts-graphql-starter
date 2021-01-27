@@ -3,39 +3,54 @@ import { graphqlHTTP } from "express-graphql";
 import { buildSchema } from "graphql";
 import dotenv from "dotenv";
 
+import { graph as helloGraph } from "./graph/hello";
+import { graph as goodbyeGraph } from "./graph/goodbye";
+
 dotenv.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 7000;
 
-const schema = buildSchema(
-  `
-  type Query {
-    hello(lang: String): String
-  }
-  `
-);
+const constructGraph = () => {
+  const subGraphs = [ helloGraph, goodbyeGraph ];
 
-const root = {
-  hello: ({ lang }) => {
-    switch (lang) {
-      case "ru":
-        return "Здравствуйте";
-      case "fr":
-        return "Bonjour"
-      default:
-        return "Hello";
+  let queries = "";
+  subGraphs.forEach(sg => {
+    queries += `${sg.schema.query}\n\n`;
+  });
+
+  const schema = buildSchema(`
+    type Query {
+      ${queries}
     }
-  },
+  `);
+
+  const root: any = {};
+  subGraphs.forEach(sg => {
+    for (const resolver in sg.resolvers) {
+      root[resolver] = sg.resolvers[resolver];
+    }
+  });
+
+  return {
+    schema,
+    root
+  }
 };
 
-const app = express();
+const run = () => {
+  const graph = constructGraph();
 
-app.use("/api", graphqlHTTP({
-  schema,
-  rootValue: root,
-  graphiql: true,
-}));
+  const app = express();
 
-app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}...`);
-});
+  app.use("/api", graphqlHTTP({
+    schema: graph.schema,
+    rootValue: graph.root,
+    graphiql: true,
+  }));
+
+  app.listen(PORT, () => {
+    console.log(`listening on port ${PORT}...`);
+  });
+}
+
+run();
