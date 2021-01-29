@@ -5,6 +5,6 @@ export interface SubSchema {
 }
 
 export interface SubGraph {
-  schema: SubSchema;
+  schema: string;
   root: any;
 }

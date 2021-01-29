@@ -1,13 +1,9 @@
 import { Db } from "../../data/db";
 import { SubGraph, SubSchema } from "../types";
 
-import query from "./query.graphql";
+import schema from "./schema.graphql";
 
 export const goodbyeGraph = (db: Db): SubGraph => {
-  const schema: SubSchema = {
-    query: query,
-  };
-
   const graph: SubGraph = {
     schema,
     root: {

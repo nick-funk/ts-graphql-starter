@@ -1,13 +1,11 @@
 import { Db } from "../../data/db";
 import { SubGraph } from "../types";
 
-import query from "./query.graphql";
+import schema from "./schema.graphql";
 
 export const helloGraph = (db: Db): SubGraph => {
   const graph: SubGraph = {
-    schema: {
-      query,
-    },
+    schema,
     root: {
       hello: ({ lang }) => {
         switch (lang) {

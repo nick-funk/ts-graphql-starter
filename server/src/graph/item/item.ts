@@ -1,17 +1,11 @@
 import { Db } from "../../data/db";
 import { SubGraph } from "../types";
 
-import types from "./types.graphql";
-import query from "./query.graphql";
-import mutation from "./mutation.graphql";
+import schema from "./schema.graphql";
 
 export const itemGraph = (db: Db): SubGraph => {
   const graph: SubGraph = {
-    schema: {
-      types,
-      query,
-      mutation,
-    },
+    schema,
     root: {
       getItem: ({ id }) => {
         return db.get(id);
