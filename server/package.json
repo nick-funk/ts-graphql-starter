@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build && node dist/dist.js",
-    "build": "webpack --config webpack.config.js"
+    "build": "npm run graph && npm run pack",
+    "pack": "webpack --config webpack.config.js",
+    "graph": "node ./graph-tools/index.js"
   },
   "keywords": [],
   "author": "",
