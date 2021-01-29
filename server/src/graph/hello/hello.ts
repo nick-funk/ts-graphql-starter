@@ -1,13 +1,12 @@
-import { Db } from "../data/db";
+import { Db } from "../../data/db";
+import { SubGraph } from "../types";
 
-export const helloGraph = (db: Db) => {
-  const graph = {
+import query from "./query.graphql";
+
+export const helloGraph = (db: Db): SubGraph => {
+  const graph: SubGraph = {
     schema: {
-      types: ``,
-      query: `
-        hello(lang: String): String
-      `,
-      mutation: ``,
+      query,
     },
     root: {
       hello: ({ lang }) => {

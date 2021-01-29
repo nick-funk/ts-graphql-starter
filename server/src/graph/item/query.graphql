@@ -1,0 +1,3 @@
+getItem(id: ID!): Item
+
+items: [Item!]
