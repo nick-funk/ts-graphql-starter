@@ -10,4 +10,4 @@ Key functionality is allowing for modulare, composable GraphQL schemas that can 
 cd server
 npm install
 npm run start
-``
+```
